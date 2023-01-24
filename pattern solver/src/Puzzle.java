@@ -3,8 +3,9 @@ import java.util.List;
 
 public class Puzzle {
 
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_WHITE = "\u001B[37m";
+    public static final String ANSI_BLACK = "\u001B[40m";
+    public static final String ANSI_WHITE = "\u001B[47m";
+    public static final String ANSI_RESET = "\u001B[0m";
     private final int rows;
     private final int columns;
     private final boolean[][] cells;
@@ -49,12 +50,12 @@ public class Puzzle {
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.columns; j++) {
                 if(this.cells[i][j]){
-                    result.append(ANSI_BLACK);
+                    result.append(ANSI_BLACK).append("   ");
                 } else {
-                    result.append(ANSI_WHITE);
+                    result.append(ANSI_WHITE).append("   ");
                 }
             }
-            result.append("\n");
+            result.append(ANSI_RESET).append("\n");
         }
         return result.toString();
     }
