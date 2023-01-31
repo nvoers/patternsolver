@@ -1,5 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
+import org.sat4j.core.VecInt;
+import org.sat4j.minisat.SolverFactory;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.ISolver;
+import org.sat4j.specs.TimeoutException;
 
 public class Puzzle {
 
@@ -11,6 +16,8 @@ public class Puzzle {
     private final boolean[][] cells;
     private final List<List<Integer>> row_constraints;
     private final List<List<Integer>> column_constraints;
+    private final List<List<Integer>> row_blocks;
+    private final List<List<Integer>> column_blocks;
 
     public Puzzle(int[][] row_constraints, int[][] column_constraints) {
         this.rows = row_constraints.length;
@@ -19,12 +26,15 @@ public class Puzzle {
 
         this.row_constraints = new ArrayList<>();
         this.column_constraints = new ArrayList<>();
+        this.row_blocks = new ArrayList<>();
+        this.column_blocks = new ArrayList<>();
         for(int[] constraint : row_constraints){
             ArrayList<Integer> temp = new ArrayList<>();
             for(int i : constraint){
                 temp.add(i);
             }
             this.row_constraints.add(temp);
+            this.row_blocks.add(new ArrayList<>());
         }
         for(int[] constraint : column_constraints){
             ArrayList<Integer> temp = new ArrayList<>();
@@ -32,6 +42,7 @@ public class Puzzle {
                 temp.add(i);
             }
             this.column_constraints.add(temp);
+            this.column_blocks.add(new ArrayList<>());
         }
     }
 
@@ -58,6 +69,67 @@ public class Puzzle {
             result.append(ANSI_RESET).append("\n");
         }
         return result.toString();
+    }
+
+    public List<List<Integer>> getRow_constraints() {
+        return this.row_constraints;
+    }
+
+    public List<List<Integer>> getColumn_constraints() {
+        return this.column_constraints;
+    }
+
+    public boolean[][] getBoard() {
+        return this.cells;
+    }
+
+    public List<Integer> getRow_constraint(int i){
+        return this.row_constraints.get(i);
+    }
+
+    public List<Integer> getColumn_constraint(int i){
+        return this.column_constraints.get(i);
+    }
+
+    public int getRow_block(int i, int j){
+        return this.row_constraints.get(i).get(j);
+    }
+
+    public int getColumn_block(int i, int j){
+        return this.column_constraints.get(i).get(j);
+    }
+
+    public int getRows(){
+        return this.rows;
+    }
+
+    public int getColumns(){
+        return this.columns;
+    }
+
+    public boolean field(int r, int c){
+        //returns true if field r,c is black
+        return this.cells[r][c];
+    }
+
+    public boolean begin_of_block_row(int b, int r, int c){
+        //returns whether the b-th block in row r starts at field r,c
+        return this.row_blocks.get(r).get(b) == c;
+    }
+
+    public boolean begin_of_block_column(int b, int r, int c){
+        //returns whether the b-th block in column c starts at field r,c
+        return this.column_blocks.get(c).get(b) == r;
+    }
+
+    public boolean part_of_block_row(int b, int r, int c){
+        //returns whether field r,c is part of the b-th block in row r
+        return this.row_blocks.get(r).get(c) == b;
+    }
+
+    public boolean part_of_block_column(int b, int r, int c){
+        //returns whether field r,c is part of the b-th block in column c
+        return this.column_blocks.get(c).get(r) == b;
     }
 
 }
